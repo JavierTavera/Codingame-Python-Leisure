@@ -1,4 +1,4 @@
-# Not ready yet!
+# Ready!
 
 # Auto-generated code below aims at helping you parse
 # the standard input according to the problem statement.
@@ -30,7 +30,7 @@ def calcu(ope, ar1, ar2):
         return ar1*ar2
 
 def look_for_last_value_1(refA1, arg1or2, valueBefore, chain, branch = 0, ar = 0):
-    print(str(refA1) + " " + str(arg1or2) + " " + str(valueBefore) + " " + str(chain))
+    #print(str(refA1) + " " + str(arg1or2) + " " + str(valueBefore) + " " + str(chain))
     ###cellsBefore[chain] = valueBefore
     cellsBefore[str(branch) + "." + str(chain)] = valueBefore
     indexChain[branch] = chain
@@ -56,6 +56,7 @@ def look_for_last_value_1(refA1, arg1or2, valueBefore, chain, branch = 0, ar = 0
     else:
         chain += 1
         ar = arg1or2
+
         if refA1 in refArg1:
             if cells[int(refArg1[refA1])][1][0] != "$" and arg1or2 == 1 and cells[int(refArg1[refA1])][3] == "":
                 ar = 2
@@ -64,11 +65,24 @@ def look_for_last_value_1(refA1, arg1or2, valueBefore, chain, branch = 0, ar = 0
                 if cells[int(refArg2[refA1])][2][0] != "$" and arg1or2 == 2 and cells[int(refArg2[refA1])][3] == "":
                     ar = 1
 
-        if arg1or2 == 1:
-            print("Referencia: " + refArg1[refA1])
+        if arg1or2 == 1 and refA1 in refArg1:
+            #print("Referencia: " + refArg1[refA1])
             look_for_last_value_1(int(refArg1[refA1]), ar, refA1, chain, branch)
-        else:
+        elif arg1or2 == 2 and refA1 in refArg2:
+            ar = 2
+            #print("Referencia: " + refArg2[refA1])
             look_for_last_value_1(int(refArg2[refA1]), ar, refA1, chain, branch)
+        elif refA1 in refArg1:
+            ar = 1
+            #print("Pasa x acá 1?")
+            if cells[refA1][1][0] == "$":
+                look_for_last_value_1(int(refArg1[refA1]), ar, refA1, chain, branch)
+        elif refA1 in refArg2:
+            ar = 2
+            #print("Pasa x acá 2?")
+            if cells[refA1][2][0] == "$":
+                look_for_last_value_1(int(refArg2[refA1]), ar, refA1, chain, branch)
+            
 
 def try_to_calculate(branch, refA1):
     if cells[refA1][1][0] == "$":
@@ -78,8 +92,8 @@ def try_to_calculate(branch, refA1):
 
     if cells[refA1][1][0] != "$" and cells[refA1][2][0] != "$":
         cells[refA1][3] = calcu(cells[refA1][0], cells[refA1][1], cells[refA1][2])
-        print(refA1)
-        print(cells[refA1][3])
+        #print(refA1)
+        #print(cells[refA1][3])
 
 for i in range(n):
     operation, arg_1, arg_2 = input().split()
@@ -107,12 +121,11 @@ for i in range(n):
         look_for_last_value_1(int(cells[i][2][1:]), 2, i, 1, 0)
         cellsBefore.clear()
 
-    print("iteracion:" + str(i) + " " + str(cells[i][0]) + " " + str(cells[i][1]) + " " + str(cells[i][2]))
+    #print("iteracion:" + str(i) + " " + str(cells[i][0]) + " " + str(cells[i][1]) + " " + str(cells[i][2]))
     cells[i][3] = calcu(cells[i][0], cells[i][1], cells[i][2])
     fin = "\n" if i != n - 1 else ""
     cellsValuesInString += str(calcu(cells[i][0], cells[i][1], cells[i][2])) + fin
-    print(str(calcu(cells[i][0], cells[i][1], cells[i][2])))
+    #print(str(calcu(cells[i][0], cells[i][1], cells[i][2])))
 
 print(cellsValuesInString)
-
 
