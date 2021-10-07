@@ -42,8 +42,9 @@ while True:
         print(keys, file=sys.stderr, flush=True)
         elev_pos = elevator_poss[keys[0]]
 
-
-    if clone_pos < elev_pos + 1:
+    if clone_pos == elev_pos:
+        print("WAIT")
+    elif clone_pos < elev_pos:
         if direction == "RIGHT":
             print("WAIT")
         else:
