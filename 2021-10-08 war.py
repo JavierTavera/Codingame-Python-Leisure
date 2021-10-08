@@ -27,10 +27,6 @@ def card_value(card):
     else:
         return cardOrder[card[:2]]
 
-###
-### Cambiar: li.insert(0, a) is around 5x faster than li = [a] + li
-###
-
 def wars(recur):
     global cardp_1, cardp_2, pat
     if len(cardp_1) < 4 or len(cardp_2) < 4:
@@ -46,27 +42,26 @@ def wars(recur):
         if card_value(card1) == card_value(card2):
             wars(3)
         elif card_value(card1) > card_value(card2):
-            cardsForTheWinner = cardsForTheWinner1 + cardsForTheWinner2
-            cardp_1 = cardp_1 + cardsForTheWinner
-            print(cardp_1, file=sys.stderr, flush=True)
+            cardsForTheWinner = cardsForTheWinner1
+            cardsForTheWinner.extend(cardsForTheWinner2)
+            cardp_1.extend(cardsForTheWinner)
         else:
-            cardsForTheWinner = cardsForTheWinner1 + cardsForTheWinner2
-            cardp_2 = cardp_2 + cardsForTheWinner
-            print(cardp_2, file=sys.stderr, flush=True)
+            cardsForTheWinner = cardsForTheWinner1
+            cardsForTheWinner.extend(cardsForTheWinner2)
+            cardp_2.extend(cardsForTheWinner)
 
 while(len(cardp_1) > 0 and len(cardp_2) > 0 and pat != 1):
-    print(rounds + 1, file=sys.stderr, flush=True)
-    print(cardp_1, file=sys.stderr, flush=True)
-    print(cardp_2, file=sys.stderr, flush=True)
     if card_value(cardp_1[0]) == card_value(cardp_2[0]):
         wars(4)
         cardsForTheWinner.clear()
+        cardsForTheWinner1.clear()
+        cardsForTheWinner2.clear()
     elif card_value(cardp_1[0]) > card_value(cardp_2[0]):
-        cardp_1 = cardp_1 + [cardp_1.pop(0)]
-        cardp_1 = cardp_1 + [cardp_2.pop(0)]
+        cardp_1.extend([cardp_1.pop(0)])
+        cardp_1.extend([cardp_2.pop(0)])
     else:
-        cardp_2 = cardp_2 + [cardp_1.pop(0)]
-        cardp_2 = cardp_2 + [cardp_2.pop(0)]
+        cardp_2.extend([cardp_1.pop(0)])
+        cardp_2.extend([cardp_2.pop(0)])
     
     rounds += 1
 
