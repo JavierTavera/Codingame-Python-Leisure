@@ -8,6 +8,7 @@ count_y = 1
 start_of_area = 0
 end_of_area = 0
 last_y = land_y = last_x = land_x = continuaba = 0
+surface = {}
 
 surface_n = int(input())  # the number of points used to draw the surface of Mars.
 for i in range(surface_n):
@@ -16,6 +17,7 @@ for i in range(surface_n):
     last_y = land_y
     last_x = land_x
     land_x, land_y = [int(j) for j in input().split()]
+    surface[i] = (land_x, land_y)
     #calculating start and end of area
     if land_y ==  last_y:
         count_y += 1
@@ -42,40 +44,86 @@ while True:
 
     #seconds_to_floor_impact with the floor
     seconds_to_floor_impact = (floor - y)/((v_speed - 38)/2)
+    
+    #Calculating obstacles
+    obstacle = -1
+    to_right = True
+    if abs(h_speed) > 5:
+        for i in surface:
+            if x < surface[i][0] < middle_area:
+                #calculating the inclination and height of the next obstacle
+                m = (y - floor)/(middle_area - x)
+                if ((y - floor) - m*(surface[i][0] - x)) < (surface[i][1] - floor):
+                    obstacle = i
+                    to_right = True
+                    seconds_to_floor_impact = (surface[i][1] + 50 - y)/((v_speed - 10)/2)
+                    print(f"{i=}", file=sys.stderr, flush=True)
+                    print(f"{m=}", file=sys.stderr, flush=True)
+                    print(f"{m*(surface[i][0] - x)=}", file=sys.stderr, flush=True)
+                    print(f"{surface[i][1] - floor=}", file=sys.stderr, flush=True)
+            elif x > surface[i][0] > middle_area:
+                m = (y - floor)/(x - middle_area)
+                if ((y - floor) - m*(x - surface[i][0])) < (surface[i][1] - floor):
+                    obstacle = i
+                    to_right = False
+                    seconds_to_floor_impact = (surface[i][1] + 50 - y)/((v_speed - 10)/2)
+    
     print(f"{seconds_to_floor_impact=}", file=sys.stderr, flush=True)
-    if x < start_of_area -100:
+    if x < middle_area:
         min_h_speed = (start_of_area + 200 - x)/seconds_to_floor_impact
         max_h_speed = (end_of_area - 200 - x)/seconds_to_floor_impact
+        prefered_angle = 45 if h_speed - max_h_speed < 80 else 60
+        if abs((middle_area - x)/(y - floor)) > 2:
+            prefered_angle = -5
+        if obstacle != -1: prefered_angle = 10
         if h_speed < min_h_speed:
-            angle = -45
+            angle = -prefered_angle
             flame = 4
         elif h_speed > max_h_speed:
-            angle = 45
+            angle = prefered_angle
             flame = 4
-        elif v_speed < -38:
-            angle = 0
+        elif v_speed < -33:
             flame = 4
+            if seconds_to_floor_impact < 25:
+                if h_speed > 18:
+                    angle = prefered_angle
+                elif h_speed < -18:
+                    angle = -prefered_angle
+                else:
+                    angle = 0
+            else:
+                angle = 0
         else:
             flame = 0
 
-    elif x > end_of_area + 100:
+    elif x > middle_area:
         min_h_speed = (end_of_area - 200 - x)/seconds_to_floor_impact
         max_h_speed = (start_of_area + 200 - x)/seconds_to_floor_impact
-        print(f"{max_h_speed=}", file=sys.stderr, flush=True)
+        prefered_angle = 45 if h_speed + max_h_speed > -80 else 60
+        if abs((middle_area - x)/(y - floor)) > 2:
+            prefered_angle = -5
+        if obstacle != -1: prefered_angle = 10
         if h_speed > min_h_speed:
-            angle = 45
+            angle = prefered_angle
             flame = 4
         elif h_speed < max_h_speed:
-            angle = -45
+            angle = -prefered_angle
             flame = 4
-        elif v_speed < -38:
-            angle = 0
+        elif v_speed < -33:
             flame = 4
+            if seconds_to_floor_impact < 25:
+                if h_speed > 18:
+                    angle = prefered_angle
+                elif h_speed < -18:
+                    angle = -prefered_angle
+                else:
+                    angle = 0
+            else:
+                angle = 0
         else:
             flame = 0
         #I want to reduce h speed to less than 20 
     else:
-        min_h_speed = (middle_area - x)/seconds_to_floor_impact
         if abs(h_speed) < 20:
             angle = 0
         elif h_speed >= 20:
@@ -86,7 +134,8 @@ while True:
             flame = 4
         else:
             flame = 0
-
+    print(f"{min_h_speed=}", file=sys.stderr, flush=True)
+    print(f"{max_h_speed=}", file=sys.stderr, flush=True)
     
     # Write an action using print
     # To debug: print("Debug messages...", file=sys.stderr, flush=True)
