@@ -33,6 +33,7 @@ for i in range(surface_n):
 print(f"{start_of_area = }", file=sys.stderr, flush=True)
 print(f"{end_of_area=}", file=sys.stderr, flush=True)
 middle_area = (start_of_area + end_of_area)/2
+bloqueo = 0
 # game loop
 while True:
     # h_speed: the horizontal speed (in m/s), can be negative.
@@ -72,9 +73,13 @@ while True:
     if x < middle_area:
         min_h_speed = (start_of_area + 200 - x)/seconds_to_floor_impact
         max_h_speed = (end_of_area - 200 - x)/seconds_to_floor_impact
-        prefered_angle = 45 if h_speed - max_h_speed < 80 else 60
+        if bloqueo == 1:
+            prefered_angle = -5
+        else:
+            prefered_angle = 45 if h_speed - max_h_speed < 80 else 60
         if abs((middle_area - x)/(y - floor)) > 2:
             prefered_angle = -5
+            bloqueo = 1
         if obstacle != -1: prefered_angle = 10
         if h_speed < min_h_speed:
             angle = -prefered_angle
@@ -99,9 +104,13 @@ while True:
     elif x > middle_area:
         min_h_speed = (end_of_area - 200 - x)/seconds_to_floor_impact
         max_h_speed = (start_of_area + 200 - x)/seconds_to_floor_impact
-        prefered_angle = 45 if h_speed + max_h_speed > -80 else 60
+        if bloqueo == 1:
+            prefered_angle = -5
+        else:
+            prefered_angle = 45 if h_speed - max_h_speed > -80 else 60
         if abs((middle_area - x)/(y - floor)) > 2:
             prefered_angle = -5
+            bloqueo = 1
         if obstacle != -1: prefered_angle = 10
         if h_speed > min_h_speed:
             angle = prefered_angle
