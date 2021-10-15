@@ -15,6 +15,11 @@ space_state = 9# blank areas
 currentState = []
 currentState.append(start_state)
 
+states = []
+states.append(False)# [0] is for circuit inverters state
+states.append(False)# [1] is for the beer state
+
+
 l, c = [int(i) for i in input().split()]
 mapa = []
 for i in range(l):
@@ -39,13 +44,34 @@ def find_path(start):
     x = bender_pos[0]
     y = bender_pos[1]
     if start == 5: start = 1
-    if currentState[0] != circuit_inverters:
-        direction, x1, y1 = f_next_move(start)
+    if start == 0: start = 4
+    direction, x1, y1 = f_next_move(start)
+    if states[0] == False:
         if mapa[y+y1][x+x1] == "#" or mapa[y+y1][x+x1] == "X":
             return find_path((start+1))
         else:
             next_move[0] = start
             return f_next_move(start)
+    else:
+        if mapa[y+y1][x+x1] == "#" or mapa[y+y1][x+x1] == "X":
+            return find_path((start-1))
+        else:
+            next_move[0] = start
+            return f_next_move(start)
+
+def f_path_modifiers(where):
+    print(f"{where=}", file=sys.stderr, flush=True)
+    if where == "S":
+        dire = 1
+    elif where == "E":
+        dire = 2
+    elif where == "N":
+        dire = 3
+    elif where == "W":
+        dire = 4
+    next_move[0] = dire
+    return f_next_move(dire)
+
 
 def look_for_directions(cState = currentState[0]):
     x = bender_pos[0]
@@ -54,29 +80,45 @@ def look_for_directions(cState = currentState[0]):
     direction, x1, y1 = f_next_move(next_move[0])
     #print(f"{cState=}", file=sys.stderr, flush=True)
     print(f"{mapa[y+y1][x+x1]=}" + f" {x+x1=}" + f" {y+y1=}", file=sys.stderr, flush=True)
-    if cState == start_state or cState == space_state or cState == obstacles_state:
-        if mapa[y+y1][x+x1] == "$":
+    if mapa[y+y1][x+x1] == "$":
+        print(direction)
+    elif mapa[y+y1][x+x1] == " ":
+        print(direction)
+        bender_pos[0] += x1
+        bender_pos[1] += y1
+        currentState[0] = space_state
+        look_for_directions(space_state)
+    elif mapa[y+y1][x+x1] == "E" or mapa[y+y1][x+x1] == "N" or mapa[y+y1][x+x1] == "W" or mapa[y+y1][x+x1] == "S":
+        print(direction)
+        bender_pos[0] += x1
+        bender_pos[1] += y1
+        direction2, x1, y1 = f_path_modifiers(mapa[y+y1][x+x1])
+        currentState[0] = path_modifiers
+        look_for_directions(path_modifiers)
+    elif mapa[y+y1][x+x1] == "#" or mapa[y+y1][x+x1] == "X":
+        if mapa[y+y1][x+x1] == "X" and states[1] == True:
             print(direction)
-        elif mapa[y+y1][x+x1] == " ":
-            print(direction)
-            bender_pos[0] += x1
-            bender_pos[1] += y1
-            currentState[0] = space_state
-            look_for_directions(space_state)
-        elif mapa[y+y1][x+x1] == "E" or mapa[y+y1][x+x1] == "N" or mapa[y+y1][x+x1] == "W" or mapa[y+y1][x+x1] == "S":
-            print(direction)
-            bender_pos[0] += x1
-            bender_pos[1] += y1
-            currentState[0] = path_modifiers
-            look_for_directions(path_modifiers)
-        elif mapa[y+y1][x+x1] == "#" or mapa[y+y1][x+x1] == "X":
-            print(f"{mapa[y+y1][x+x1]=}", file=sys.stderr, flush=True)
+        else:
             direction2, x1, y1 = find_path(1)
             print(direction2)
-            bender_pos[0] += x1
-            bender_pos[1] += y1
-            currentState[0] = obstacles_state
-            look_for_directions(obstacles_state)
+        bender_pos[0] += x1
+        bender_pos[1] += y1
+        currentState[0] = obstacles_state
+        look_for_directions(obstacles_state)
+    elif mapa[y+y1][x+x1] == "I":
+        print(direction)
+        bender_pos[0] += x1
+        bender_pos[1] += y1
+        states[0] = True if states[0] == False else False
+        currentState[0] = circuit_inverters
+        look_for_directions(circuit_inverters)
+    elif mapa[y+y1][x+x1] == "B":
+        print(direction)
+        bender_pos[0] += x1
+        bender_pos[1] += y1
+        states[1] = True if states[1] == False else False
+        currentState[0] = beer_state
+        look_for_directions(beer_state)
 
 look_for_directions()
 # Write an answer using print
