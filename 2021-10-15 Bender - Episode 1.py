@@ -41,7 +41,7 @@ def find_path(start):
     if start == 5: start = 1
     if currentState[0] != circuit_inverters:
         direction, x1, y1 = f_next_move(start)
-        if mapa[x+x1][y+y1] == "#" or mapa[x+x1][y+y1] == "X":
+        if mapa[y+y1][x+x1] == "#" or mapa[y+y1][x+x1] == "X":
             return find_path((start+1))
         else:
             next_move[0] = start
@@ -50,27 +50,28 @@ def find_path(start):
 def look_for_directions(cState = currentState[0]):
     x = bender_pos[0]
     y = bender_pos[1]
+    print(f"{x=}" + f" {y=}", file=sys.stderr, flush=True)
     direction, x1, y1 = f_next_move(next_move[0])
     #print(f"{cState=}", file=sys.stderr, flush=True)
-    print(f"{mapa[x+x1][y+y1]=}" + f" {x+x1=}" + f" {y+y1=}", file=sys.stderr, flush=True)
+    print(f"{mapa[y+y1][x+x1]=}" + f" {x+x1=}" + f" {y+y1=}", file=sys.stderr, flush=True)
     if cState == start_state or cState == space_state or cState == obstacles_state:
-        if mapa[x+x1][y+y1] == "$":
+        if mapa[y+y1][x+x1] == "$":
             print(direction)
-        elif mapa[x+x1][y+y1] == " ":
+        elif mapa[y+y1][x+x1] == " ":
             print(direction)
             bender_pos[0] += x1
             bender_pos[1] += y1
             currentState[0] = space_state
             look_for_directions(space_state)
-        elif mapa[x+x1][y+y1] == "E" or mapa[x+x1][y+y1] == "N" or mapa[x+x1][y+y1] == "W" or mapa[x+x1][y+y1] == "S":
+        elif mapa[y+y1][x+x1] == "E" or mapa[y+y1][x+x1] == "N" or mapa[y+y1][x+x1] == "W" or mapa[y+y1][x+x1] == "S":
             print(direction)
             bender_pos[0] += x1
             bender_pos[1] += y1
             currentState[0] = path_modifiers
             look_for_directions(path_modifiers)
-        elif mapa[x+x1][y+y1] == "#" or mapa[x+x1][y+y1] == "X":
-            print(f"{mapa[x+x1][y+y1]=}", file=sys.stderr, flush=True)
-            direction2, x1, y1 = find_path(next_move[0])
+        elif mapa[y+y1][x+x1] == "#" or mapa[y+y1][x+x1] == "X":
+            print(f"{mapa[y+y1][x+x1]=}", file=sys.stderr, flush=True)
+            direction2, x1, y1 = find_path(1)
             print(direction2)
             bender_pos[0] += x1
             bender_pos[1] += y1
