@@ -1,5 +1,4 @@
 #Not yet finished
-
 import sys
 import math
 
@@ -19,25 +18,38 @@ for i in range(l):
     link[n2] = link[n2] + [n1]
 
 ei = [int(input()) for i in range(e)]
-steps_to_gateway = {ei[i]:-1 for i in range(e)}
+#steps_to_gateway = {ei[i]:-1 for i in range(e)}
 doNotVisitAgain = []
 
 def f_steps_to_gateway(a_node):
     nextNode = [a_node]
     tempNodes = []
-    steps = 0
+    #steps = 0
     while True:
         print(f"{nextNode = }", file=sys.stderr, flush=True)
         tempNodes.clear()
         for nod in nextNode:
             doNotVisitAgain.append(nod)
+            print(f"{doNotVisitAgain = }", file=sys.stderr, flush=True)
             for nod3 in link[nod]:
                 print(f"{nod3 = }", file=sys.stderr, flush=True)
+                print(f"{nod = }", file=sys.stderr, flush=True)
+                print(f"{sever_link[nod3] = }", file=sys.stderr, flush=True)
                 if nod in ei and not nod in sever_link[nod3]:
                     sever_link[nod3] = sever_link[nod3] + [nod]
                     sever_link[nod] = sever_link[nod] + [nod3]
                     print(nod, nod3, file=sys.stderr, flush=True)
+                    doNotVisitAgain.clear()
                     return str(nod) + " " + str(nod3)
+                #elif link[nod] in ei and not nod in sever_link[nod3]:
+                else:
+                    for knod in ei:
+                        if nod in link[knod] and not nod in sever_link[knod]:
+                            sever_link[knod] = sever_link[nod3] + [nod]
+                            sever_link[nod] = sever_link[nod] + [knod]
+                            print(nod, knod, file=sys.stderr, flush=True)
+                            doNotVisitAgain.clear()
+                            return str(nod) + " " + str(knod)
         for nod in nextNode:
             for nod2 in link[nod]:
                 if not nod2 in doNotVisitAgain and not nod2 in nextNode:
@@ -77,4 +89,3 @@ while True:
     # To debug: print("Debug messages...", file=sys.stderr, flush=True)
 
     #print("3 4")
-
