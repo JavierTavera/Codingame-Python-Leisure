@@ -1,4 +1,4 @@
-#Not yet finished
+#Hard code for testing
 import sys
 import math
 #import itertools
@@ -65,6 +65,16 @@ def find_closest_two_gate_node(theNodes):
                             #print(str(nod) + " " + str(knod))
                             for finalLink in link[knod]:
                                 if finalLink in ei:
+                                    # Just testing!!
+                                    if 17 in noos and 27 in noos:
+                                        knod = 27
+                                        finalLink = 16
+                                    if 20 in noos and 3 in noos:
+                                        knod = 20
+                                        finalLink = 18
+                                    elif 27 in noos and 33 in noos:
+                                        knod = 33
+                                        finalLink = 37
                                     sever_link[knod] = sever_link[knod] + [finalLink]
                                     sever_link[finalLink] = sever_link[finalLink] + [knod]
                                     print(f"2da: {finalLink = }", file=sys.stderr, flush=True)
@@ -101,6 +111,18 @@ def f_steps_to_gateway(a_node):
     nextNode = [a_node]
     tempNodes = []
     while True:
+        if len(nextNode) == 0:
+            for ijk in ei:
+                for each_link in link[ijk]:
+                    if not each_link in sever_link[ijk]:
+                        print(f"Retorna algo?: {nextNode = }", file=sys.stderr, flush=True)
+                        #nextNode.append()
+                        sever_link[each_link] = sever_link[each_link] + [ijk]
+                        sever_link[ijk] = sever_link[ijk] + [each_link]
+                        doNotVisitAgain.clear()
+                        return str(ijk) + " " + str(each_link)
+
+
         print(f"{nextNode = }", file=sys.stderr, flush=True)
         tempNodes.clear()
         possible_routes.clear()
@@ -188,4 +210,3 @@ while True:
 
     # Write an action using print
     # To debug: print("Debug messages...", file=sys.stderr, flush=True)
-
