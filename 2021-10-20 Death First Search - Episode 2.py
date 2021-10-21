@@ -11,57 +11,85 @@ import math
 # e: the number of exit gateways
 n, l, e = [int(i) for i in input().split()]
 link = {i:[] for i in range(n)}
+nodes = set()
 
 for i in range(l):
     # n1: N1 and N2 defines a link between these nodes
     n1, n2 = [int(j) for j in input().split()]
     link[n1] = link[n1] + [n2]
     link[n2] = link[n2] + [n1]
+    nodes.add(n1)
+    nodes.add(n2)
 
 ei = [int(input()) for i in range(e)]
-notVisit = set()
-out_of_loop = [0]
-def find_next_do_gateway(start, nNode):
-    while True:
-        #notVisit = itertools.chain(start, nNode)
-        #notVisit = start + nNode
-        #notVisit.extend(start)
-        #notVisit.extend(nNode) # podría quitarlo
-        notVisit.update(start)
-        notVisit.update(nNode)
-        for nod in start:
-            if not nod in notVisit:
-                counting = 0
-                for gate in ei:
-                    if nod in link[gate]: counting += 1
-                    if counting == 2:
-                        sever_link[gate] = sever_link[gate] + [nod]
-                        sever_link[nod] = sever_link[nod] + [gate]
-                        notVisit.clear()
-                        print(gate, nod)
-                        return True
-        # Retirarse si se exhaustó la lista
-        count2 = 0
-        out_of_loop[0] += 1
-        if out_of_loop[0] > 50:
-            return False
-        for every_node in link:
-            if not every_node in notVisit and not every_node in ei:
-                print(f"{every_node = }", file=sys.stderr, flush=True)
-                count2 += 1
-        if count2 == 0:
-            return False
-        #seguir buscando
-        print(f"{notVisit = }", file=sys.stderr, flush=True)
-        print(f"{start = }", file=sys.stderr, flush=True)
-        for iNode in start:
-            for iNode2 in link[iNode]:
-                print(f"{iNode2 = }", file=sys.stderr, flush=True)
-                if not iNode2 in notVisit:
-                    return find_next_do_gateway([iNode2], nNode)
 
-            
-                    
+
+two_gates = []
+noos = set()
+for no in nodes:
+    count_no = 0
+    for gate in ei:
+        if no in link[gate]:
+            count_no += 1
+        if count_no == 2:
+            two_gates.append([gate, no])
+            noos.add(no)
+
+def find_closest_two_gate_node(theNodes):
+    nextNode = theNodes
+    tempNodes = []
+    allVisitedNodes = set()
+    while True:
+        tempNodes.clear()
+        for nod in nextNode:
+            allVisitedNodes.add(nod)
+            doNotVisitAgain.append(nod)
+            for nod3 in link[nod]:
+                allVisitedNodes.add(nod3)
+                if nod in noos:# and not nod in sever_link[nod3]:
+                    print(f"{nod = }", file=sys.stderr, flush=True)
+                    print(f"{nod3 = }", file=sys.stderr, flush=True)
+                    for finalLink in link[nod]:
+                        if finalLink in ei:
+                            sever_link[finalLink] = sever_link[finalLink] + [nod]
+                            sever_link[nod] = sever_link[nod] + [finalLink]
+                            doNotVisitAgain.clear()
+                            #print(str(nod) + " " + str(finalLink))
+                            print(f"1era: {noos = }", file=sys.stderr, flush=True)
+                            noos.remove(nod)
+                            return str(nod) + " " + str(finalLink)
+                else:
+                    for knod in noos:
+                        if nod in link[knod] and not nod in sever_link[knod] and knod  == nod3: # in here, knod would be the gateway
+                            doNotVisitAgain.clear()
+                            #print(str(nod) + " " + str(knod))
+                            for finalLink in link[knod]:
+                                if finalLink in ei:
+                                    sever_link[knod] = sever_link[knod] + [finalLink]
+                                    sever_link[finalLink] = sever_link[finalLink] + [knod]
+                                    print(f"2da: {finalLink = }", file=sys.stderr, flush=True)
+                                    print(f"2da: {noos = }", file=sys.stderr, flush=True)
+                                    print(f"2da: {knod = }", file=sys.stderr, flush=True)
+                                    noos.remove(knod)
+                                    return str(finalLink) + " " + str(knod)
+# ver si quiebro
+        print(f"{allVisitedNodes = }", file=sys.stderr, flush=True)
+        count3 = 0
+        for nud in nodes:
+            if not nud in allVisitedNodes:
+                count3 += 1
+        if count3 == 0:
+            print("Quiebre", file=sys.stderr, flush=True)
+            return False
+        for nod in allVisitedNodes:#nextNode:
+            for nod2 in link[nod]:
+                if not nod2 in doNotVisitAgain and not nod2 in nextNode:
+                    tempNodes.append(nod2)
+            nextNode.clear()
+            nextNode = [-1] + tempNodes
+            nextNode.remove(-1)
+
+
         
 
 possible_routes = []
@@ -111,16 +139,24 @@ def f_steps_to_gateway(a_node):
                 else:
                     sever_link[routes[0]] = sever_link[routes[0]] + [routes[1]]
                     sever_link[routes[1]] = sever_link[routes[1]] + [routes[0]]
+                    if routes[0] in noos:
+                        noos.remove(routes[0])
                     return str(routes[0]) + " " + str(routes[1])
-            out_of_loop[0] = 0
-            if find_next_do_gateway(first_node, nextNode):
-                return
+            print(f"{noos = } is " + f"{len(noos) > 0}", file=sys.stderr, flush=True)
+            if len(noos) > 0:
+                temp_variable = find_closest_two_gate_node(nextNode)
+                if not temp_variable == False:
+                    return temp_variable
+                #if find_closest_two_gate_node(nextNode):
+                    #return
+            print(f"{possible_nodes = }", file=sys.stderr, flush=True)
             sever_link[possible_routes[0][0]] = sever_link[possible_routes[0][0]] + [possible_routes[0][1]]
             sever_link[possible_routes[0][1]] = sever_link[possible_routes[0][1]] + [possible_routes[0][0]]
+            print(str(possible_routes[0][0]) + " " + str(possible_routes[0][1]), file=sys.stderr, flush=True)
             return str(possible_routes[0][0]) + " " + str(possible_routes[0][1])
-            nextNode.clear()
-            nextNode = [-1] + first_node
-            nextNode.remove(-1)
+            #nextNode.clear()
+            #nextNode = [-1] + first_node
+            #nextNode.remove(-1)
         
         else:
             for nod in nextNode:
@@ -132,17 +168,24 @@ def f_steps_to_gateway(a_node):
                 nextNode = [-1] + tempNodes
                 nextNode.remove(-1)
 
-#ei = []
-#for i in range(e):
-#    ei.append(int(input()))  # the index of a gateway node
-
 sever_link = {i:[] for i in range(n)}
 # game loop
 while True:
     si = int(input())  # The index of the node on which the Bobnet agent is positioned this turn
     print(f"{si = }", file=sys.stderr, flush=True)
+    link_to_gateway = -1
+    for nod in link[si]:
+        if nod in ei and not nod in sever_link[si]:# or si in sever_link):
+            link_to_gateway = nod
+            sever_link[nod] = sever_link[nod] + [si]
+            sever_link[si] = sever_link[si] + [nod]
+            print(nod, si)
+            break
 
-    print(f_steps_to_gateway(si))
+    if link_to_gateway == -1:
+        print(f_steps_to_gateway(si))
+        possible_nodes.clear()
 
     # Write an action using print
     # To debug: print("Debug messages...", file=sys.stderr, flush=True)
+
