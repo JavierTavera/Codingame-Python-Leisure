@@ -1,4 +1,3 @@
-#Hard code for testing
 import sys
 import math
 #import itertools
@@ -36,11 +35,34 @@ for no in nodes:
             noos.add(no)
 
 def find_closest_two_gate_node(theNodes):
+    count4 = 0
+    nodeToAvoid = -1
     nextNode = theNodes
     tempNodes = []
     allVisitedNodes = set()
+
+    if len(noos) > 2:
+        for nodesToErase in nextNode:
+            if not any(e in link[nodesToErase] for e in ei):
+                nextNode.remove(nodesToErase)
+        if len(nextNode) == 0: nextNode = theNodes
     while True:
+        print(f"From 1st function: {nextNode = }", file=sys.stderr, flush=True)
+        if len(noos) > 2:
+            #for nodesToErase in nextNode:
+            ni = nu = 0
+            while(nu >= 0):
+                nu = len(nextNode) - ni - 2
+                print(f"{nextNode[ni] = }", file=sys.stderr, flush=True)
+                print(f"{link[nextNode[ni]] = }", file=sys.stderr, flush=True)
+                if not any(e in link[nextNode[ni]] for e in ei):
+                    print(f"{nextNode[ni] = }", file=sys.stderr, flush=True)
+                    nextNode.remove(nextNode[ni])
+                    ni -= 1
+                ni += 1
+            if len(nextNode) == 0: nextNode = tempNodes
         tempNodes.clear()
+        print(f"From 2nd function: {nextNode = }", file=sys.stderr, flush=True)
         for nod in nextNode:
             allVisitedNodes.add(nod)
             doNotVisitAgain.append(nod)
@@ -49,6 +71,7 @@ def find_closest_two_gate_node(theNodes):
                 if nod in noos:# and not nod in sever_link[nod3]:
                     print(f"{nod = }", file=sys.stderr, flush=True)
                     print(f"{nod3 = }", file=sys.stderr, flush=True)
+                    nodeToAvoid = -1
                     for finalLink in link[nod]:
                         if finalLink in ei:
                             sever_link[finalLink] = sever_link[finalLink] + [nod]
@@ -63,25 +86,29 @@ def find_closest_two_gate_node(theNodes):
                         if nod in link[knod] and not nod in sever_link[knod] and knod  == nod3: # in here, knod would be the gateway
                             doNotVisitAgain.clear()
                             #print(str(nod) + " " + str(knod))
-                            for finalLink in link[knod]:
-                                if finalLink in ei:
-                                    # Just testing!!
-                                    if 17 in noos and 27 in noos:
-                                        knod = 27
-                                        finalLink = 16
-                                    if 20 in noos and 3 in noos:
-                                        knod = 20
-                                        finalLink = 18
-                                    elif 27 in noos and 33 in noos:
-                                        knod = 33
-                                        finalLink = 37
-                                    sever_link[knod] = sever_link[knod] + [finalLink]
-                                    sever_link[finalLink] = sever_link[finalLink] + [knod]
-                                    print(f"2da: {finalLink = }", file=sys.stderr, flush=True)
-                                    print(f"2da: {noos = }", file=sys.stderr, flush=True)
-                                    print(f"2da: {knod = }", file=sys.stderr, flush=True)
-                                    noos.remove(knod)
-                                    return str(finalLink) + " " + str(knod)
+                            if len(noos) == 1 or len(noos) > 2:
+                                for finalLink in link[knod]:
+                                    if finalLink in ei:
+                                        sever_link[knod] = sever_link[knod] + [finalLink]
+                                        sever_link[finalLink] = sever_link[finalLink] + [knod]
+                                        print(f"2da: {finalLink = }", file=sys.stderr, flush=True)
+                                        print(f"2da: {noos = }", file=sys.stderr, flush=True)
+                                        print(f"2da: {knod = }", file=sys.stderr, flush=True)
+                                        noos.remove(knod)
+                                        return str(finalLink) + " " + str(knod)
+                            elif len(noos) == 2:
+                                for noos2 in noos:
+                                    if noos2 != nod3:
+                                        print(f"3a: {two_gates = }", file=sys.stderr, flush=True)
+                                        print(f"3a: {noos2 = }", file=sys.stderr, flush=True)
+                                        for i in range(len(two_gates)):
+                                            if two_gates[i][1] == noos2:
+                                                valGate = two_gates[i][0]
+                                        sever_link[valGate] = sever_link[valGate] + [noos2]
+                                        sever_link[noos2] = sever_link[noos2] + [valGate]
+                                        print(f"3a: {noos2 = }", file=sys.stderr, flush=True)
+                                        noos.remove(noos2)
+                                        return str(noos2) + " " + str(valGate)
 # ver si quiebro
         print(f"{allVisitedNodes = }", file=sys.stderr, flush=True)
         count3 = 0
@@ -98,8 +125,6 @@ def find_closest_two_gate_node(theNodes):
             nextNode.clear()
             nextNode = [-1] + tempNodes
             nextNode.remove(-1)
-
-
         
 
 possible_routes = []
